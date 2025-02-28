@@ -1,3 +1,6 @@
+using Catalog.API.Documents;
+using Catalog.API.Dtos;
+using Catalog.API.Extensions;
 using Catalog.API.Repositories;
 using Catalog.API.Requests;
 
@@ -11,38 +14,90 @@ public class ProductService: IProductService
     {
         _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
     }
-    public Task<object?> GetProducts()
+    public async Task<List<ProductDto>> GetProductsAsync()
     {
-        throw new NotImplementedException();
+        var res =  await _productRepository
+            .FindAsync(p => true)
+            .ConfigureAwait(false);
+        
+        return res.ToProductDtoList();
+    
     }
 
-    public Task<object?> GetProduct(string id)
+    public async Task<ProductDto> GetProductAsync(string id)
     {
-        throw new NotImplementedException();
+        var res = await _productRepository
+            .GetAsync(Guid.Parse(id))
+            .ConfigureAwait(false);
+
+        return res.ToProductDto();
+
     }
 
-    public Task<object?> GetProductByCategory(string categoryName)
+    public async Task<List<ProductDto>> GetProductByCategoryAsync(string categoryName)
     {
-        throw new NotImplementedException();
+        var res = await _productRepository
+            .FindAsync(p => p.Category == categoryName)
+            .ConfigureAwait(false);
+
+        return res.ToProductDtoList();
+        
+        
     }
 
-    public Task<object?> GetProductByName(string name)
+    public async Task<List<ProductDto>> GetProductByNameAsync(string name)
     {
-        throw new NotImplementedException();
+        var res = await _productRepository
+            .FindAsync(p => p.Name == name)
+            .ConfigureAwait(false);
+
+        return res.ToProductDtoList();
     }
 
-    public Task<Guid> CreateProduct(ProductRequest product)
+    public async Task<ProductDto> CreateProductAsync(ProductRequest product)
     {
-        throw new NotImplementedException();
+        var productDto = product.ToProductDto();
+        
+        var productId = await _productRepository
+            .AddAsync(productDto.ToProductDocument())
+            .ConfigureAwait(false);
+        
+        productDto.Id = productId;
+
+        return productDto;
     }
 
-    public Task<object?> UpdateProduct(ProductRequest product)
+    public async Task<ProductDto> UpdateProductAsync(ProductRequest product)
     {
-        throw new NotImplementedException();
+        var res = await _productRepository
+            .ExistsAsync(product.Id)
+            .ConfigureAwait(false);
+        if (!res) throw new InvalidOperationException($"Product with id: {product.Id} not found.");
+        
+        var productDto = product.ToProductDto();
+        
+        await _productRepository
+            .UpdateAsync(productDto.ToProductDocument())
+            .ConfigureAwait(false);
+
+        return productDto;
     }
 
-    public Task<object?> DeleteProduct(string id)
+    public async Task<bool> DeleteProductAsync(string id)
     {
-        throw new NotImplementedException();
+        var res = await _productRepository
+            .ExistsAsync(Guid.Parse(id))
+            .ConfigureAwait(false);
+
+        if (!res)
+        {
+            return false;
+        }
+
+        await _productRepository
+            .DeleteAsync(Guid.Parse(id))
+            .ConfigureAwait(false);
+
+        return true;
     }
 }

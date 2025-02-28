@@ -1,8 +1,6 @@
-﻿using Convey.Types;
+namespace Catalog.API.Dtos;
 
-namespace Catalog.API.Documents;
-
-public class ProductDocument : IIdentifiable<Guid>
+public class ProductDto
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -12,8 +10,4 @@ public class ProductDocument : IIdentifiable<Guid>
     public decimal Price { get; set; }
     public string? Category { get; set; }
     public int Version { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public bool IsActive { get; set; } = true;
 }
-
