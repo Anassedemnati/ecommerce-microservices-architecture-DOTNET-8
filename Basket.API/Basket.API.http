@@ -1,0 +1,19 @@
+@Basket.API_HostAddress = http://localhost:5124
+
+
+GET {{Basket.API_HostAddress}}/api/v1/Basket/username
+Accept: application/json
+
+POST {{Basket.API_HostAddress}}/api/v1/Basket
+Accept: application/json
+
+DELETE {{Basket.API_HostAddress}}/api/v1/Basket/username
+Accept: application/json
+
+POST {{Basket.API_HostAddress}}/api/v1/Basket/Checkout
+Accept: application/json
+
+
+
+
+###
