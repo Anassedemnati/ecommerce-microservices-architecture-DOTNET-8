@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.API", "Catalog.API\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basket.API", "Basket.API\Basket.API.csproj", "{694ADC10-DEA2-486E-A379-616D7BC065B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discount.API", "Discount.API\Discount.API.csproj", "{89F96C55-140C-4A23-800F-64E2255839C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{694ADC10-DEA2-486E-A379-616D7BC065B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{694ADC10-DEA2-486E-A379-616D7BC065B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{694ADC10-DEA2-486E-A379-616D7BC065B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89F96C55-140C-4A23-800F-64E2255839C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89F96C55-140C-4A23-800F-64E2255839C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89F96C55-140C-4A23-800F-64E2255839C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89F96C55-140C-4A23-800F-64E2255839C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
