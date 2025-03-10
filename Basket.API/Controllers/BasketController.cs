@@ -1,6 +1,8 @@
 using System.Net;
 using Basket.API.Entities;
+using Basket.API.Events;
 using Basket.API.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Basket.API.Controllers;
@@ -11,12 +13,15 @@ public class BasketController : ControllerBase
 {
     private readonly ILogger<BasketController> _logger;
     private readonly IBasketService _basketService;
+    private readonly IPublishEndpoint _publishEndpoint;
     
-    public BasketController(ILogger<BasketController> logger, IBasketService basketService)
+    public BasketController(ILogger<BasketController> logger, IBasketService basketService, IPublishEndpoint publishEndpoint)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _basketService = basketService ?? throw new ArgumentNullException(nameof(basketService));
+        _publishEndpoint = publishEndpoint ?? throw new ArgumentNullException(nameof(publishEndpoint));
     }
+
     
     [HttpGet("{userName}", Name = "GetBasket")]
     public async Task<ActionResult<ShoppingCart>> GetBasket(string? userName)
@@ -59,6 +64,28 @@ public class BasketController : ControllerBase
         }
 
         // send checkout event to Kafka
+        
+        var eventMessage = new BasketCheckoutEvent()
+        {
+            UserName = basket.UserName,
+            TotalPrice = basket.TotalPrice,
+            FirstName = basketCheckout.FirstName,
+            LastName = basketCheckout.LastName,
+            EmailAddress = basketCheckout.EmailAddress,
+            AddressLine = basketCheckout.AddressLine,
+            Country = basketCheckout.Country,
+            State = basketCheckout.State,
+            ZipCode = basketCheckout.ZipCode,
+            Items = basket.Items.Select(item => new BasketCheckoutEventItem()
+            {
+                ProductId = item.ProductId,
+                ProductName = item.ProductName,
+                Price = item.Price,
+                Quantity = item.Quantity
+            }).ToList()
+        };
+        
+        await _publishEndpoint.Publish(eventMessage);
         
 
         // remove the basket

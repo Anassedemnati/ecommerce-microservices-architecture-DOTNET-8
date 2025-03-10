@@ -1,7 +1,9 @@
+using Basket.API.Events;
 using Basket.API.Middlewares;
 using Basket.API.Repositories;
 using Basket.API.RestServices;
 using Basket.API.Services;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,28 @@ builder.Services.AddHttpClient<IDiscountRestService, DiscountRestService>(client
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 );
+
+//add MassTransit configuration fot kafka
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingInMemory((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
+
+    x.AddRider(rider =>
+    {
+        rider.AddProducer<BasketCheckoutEvent>(builder.Configuration.GetValue<string>("EventBusSettings:KafkaTopic"));
+
+        rider.UsingKafka((context, k) =>
+        {
+            k.Host(builder.Configuration.GetValue<string>("EventBusSettings:KafkaUrl"));
+        });
+    });
+});
+
+
+
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
