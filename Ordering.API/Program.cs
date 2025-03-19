@@ -1,3 +1,4 @@
+using KafkaFlow;
 using Microsoft.EntityFrameworkCore;
 using Ordering.API.EventConsumer;
 using Ordering.API.Persistence;
@@ -15,6 +16,27 @@ builder.Services.AddDbContext<OrderContext>(options =>
 builder.Services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+
+
+builder.Services.AddKafka(kafka => kafka
+    .UseConsoleLog()
+    .AddCluster(cluster => cluster
+        .WithBrokers(new []
+        {
+            builder.Configuration["KafkaSettings:Broker"]
+        })
+        .AddConsumer(consumer => consumer
+            .Topic(builder.Configuration["KafkaSettings:TopicName"])
+            .WithGroupId("order-api")
+            .WithBufferSize(100)
+            .WithWorkersCount(3)
+            .WithAutoOffsetReset(AutoOffsetReset.Earliest)
+            .AddMiddlewares(middlewares => 
+                    middlewares.Add<BasketCheckoutMiddleware>(MiddlewareLifetime.Transient)
+                )
+            )
+        )
+);
 
 // Add services to the container.
 
@@ -34,6 +56,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+var bus = app.Services.CreateKafkaBus();
+await bus.StartAsync();
 
 DatabaseInitializer.Initialize(app.Services);
 

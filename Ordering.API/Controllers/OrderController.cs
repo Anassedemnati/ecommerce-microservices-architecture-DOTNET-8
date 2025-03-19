@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Ordering.API.Entities;
 using Ordering.API.Events;
 using Ordering.API.Extensions;
-using Ordering.API.Repositories;
 using Ordering.API.Services;
 
 namespace Ordering.API.Controllers;
@@ -32,12 +31,12 @@ public class OrderController : ControllerBase
 
     // testing purpose
     [HttpPost(Name = "CheckoutOrder")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(int), (int)HttpStatusCode.Created)]
     public async Task<ActionResult<int>> CheckoutOrder([FromBody] BasketCheckoutEvent request)
     {
         var order = request.ToOrder();
         var result = await _orderService.CheckoutOrder(order);
-        return Ok(result);
+        return Created("GetOrder", result);
     }
 
     [HttpPut(Name = "UpdateOrder")]

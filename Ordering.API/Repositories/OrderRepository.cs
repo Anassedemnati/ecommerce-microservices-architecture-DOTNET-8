@@ -14,6 +14,7 @@ public class OrderRepository: RepositoryBase<Order> , IOrderRepository
     {
         var orderList = await _dbContext.Orders
             .Where(o => o.UserName == userName)
+            .Include(o => o.Items)
             .ToListAsync();
         return orderList;
     }
