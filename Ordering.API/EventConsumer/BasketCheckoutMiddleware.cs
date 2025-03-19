@@ -22,7 +22,7 @@ public class BasketCheckoutMiddleware : IMessageMiddleware
     {
         try
         {
-            Console.WriteLine(context.Message.Value);
+            // Deserialize the message from byte[] to BasketCheckoutEvent
             var basketCheckoutEvent = JsonSerializer.Deserialize<BasketCheckoutEvent>(context.Message.Value as byte[]);
             
             if (basketCheckoutEvent is null)
